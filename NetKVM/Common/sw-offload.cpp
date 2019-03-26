@@ -714,7 +714,8 @@ tTcpIpPacketParsingResult ParaNdis_CheckSumVerify(
                                                 BOOLEAN verifyLength,
                                                 LPCSTR caller)
 {
-    IPHeader *pIpHeader = (IPHeader *)RtlOffsetToPointer(pDataPages[0].Cached, ulStartOffset);
+    IPHeader *pIpHeader = (IPHeader *) RtlOffsetToPointer(pDataPages[0].Cached, ulStartOffset);
+
     tTcpIpPacketParsingResult res = QualifyIpPacket(pIpHeader, ulDataLength, verifyLength);
     if (res.ipStatus == ppresNotIP || res.ipCheckSum == ppresIPTooShort)
         return res;
