@@ -81,8 +81,10 @@
   </PropertyGroup>
   <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Win10 Release|ARM64'">
     <DriverTargetPlatform>Desktop</DriverTargetPlatform>
-    <_NT_TARGET_VERSION></_NT_TARGET_VERSION>
-    <TargetVersion></TargetVersion>
+    <_NT_TARGET_VERSION>
+    </_NT_TARGET_VERSION>
+    <TargetVersion>
+    </TargetVersion>
   </PropertyGroup>
   <PropertyGroup Label="PropertySheets" />
   <!-- Needed by any VcxProj -->
@@ -272,6 +274,8 @@
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <CallingConvention>Cdecl</CallingConvention>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32_LEAN_AND_MEAN=1;NETCO_EXPORTS</PreprocessorDefinitions>
+      <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
+      <Optimization>Disabled</Optimization>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Win8 Release|x64'">
