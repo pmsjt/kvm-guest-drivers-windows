@@ -93,6 +93,7 @@ typedef struct _tagCompletePhysicalAddress
 {
     PHYSICAL_ADDRESS    Physical;
     PVOID               Virtual;
+    PVOID               Cached;
     ULONG               size;
 } tCompletePhysicalAddress;
 
@@ -833,6 +834,8 @@ tTcpIpPacketParsingResult ParaNdis_CheckSumVerifyFlat(
                                                 LPCSTR caller)
 {
     tCompletePhysicalAddress SGBuffer;
+    SGBuffer.Physical.QuadPart = 0;
+    SGBuffer.Cached = pBuffer;
     SGBuffer.Virtual = pBuffer;
     SGBuffer.size = ulDataLength;
     return ParaNdis_CheckSumVerify(&SGBuffer, ulDataLength, 0, flags, verifyLength, caller);

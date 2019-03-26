@@ -182,7 +182,7 @@ static __inline USHORT CheckSumCalculator(tCompletePhysicalAddress *pDataPages, 
 
     while(len > 0)
     {
-        PVOID pCurrentPageDataStart = RtlOffsetToPointer(pCurrentPage->Virtual, ulCurrPageOffset);
+        PVOID pCurrentPageDataStart = RtlOffsetToPointer(pCurrentPage->Cached, ulCurrPageOffset);
         ULONG ulCurrentPageDataLength = min(len, pCurrentPage->size - ulCurrPageOffset);
 
         uRawCSum += RawCheckSumCalculator(pCurrentPageDataStart, ulCurrentPageDataLength);
@@ -399,7 +399,7 @@ QualifyIpPacket(IPHeader *pIpHeader, ULONG len, BOOLEAN verifyLength)
         res.IsFragment = (pIpHeader->v4.ip_offset & ~0xC0) != 0;
         switch (pIpHeader->v4.ip_protocol)
         {
-            case PROTOCOL_TCP:
+        case PROTOCOL_TCP:
             {
                 res = ProcessTCPHeader(res, pIpHeader, len, ipHeaderSize);
             }
@@ -553,7 +553,7 @@ VerifyTcpChecksum(
 {
     USHORT  phcs;
     tTcpIpPacketParsingResult res = known;
-    IPHeader *pIpHeader = (IPHeader *)RtlOffsetToPointer(pDataPages[0].Virtual, ulStartOffset);
+    IPHeader *pIpHeader = (IPHeader *)RtlOffsetToPointer(pDataPages[0].Cached, ulStartOffset);
     TCPHeader *pTcpHeader = (TCPHeader *)RtlOffsetToPointer(pIpHeader, res.ipHeaderSize);
     USHORT saved = pTcpHeader->tcp_xsum;
     USHORT xxpHeaderAndPayloadLen = GetXxpHeaderAndPayloadLen(pIpHeader, res);
@@ -624,7 +624,7 @@ VerifyUdpChecksum(
 {
     USHORT  phcs;
     tTcpIpPacketParsingResult res = known;
-    IPHeader *pIpHeader = (IPHeader *)RtlOffsetToPointer(pDataPages[0].Virtual, ulStartOffset);
+    IPHeader *pIpHeader = (IPHeader *)RtlOffsetToPointer(pDataPages[0].Cached, ulStartOffset);
     UDPHeader *pUdpHeader = (UDPHeader *)RtlOffsetToPointer(pIpHeader, res.ipHeaderSize);
     USHORT saved = pUdpHeader->udp_xsum;
     USHORT xxpHeaderAndPayloadLen = GetXxpHeaderAndPayloadLen(pIpHeader, res);
@@ -721,7 +721,7 @@ tTcpIpPacketParsingResult ParaNdis_CheckSumVerify(
                                                 BOOLEAN verifyLength,
                                                 LPCSTR caller)
 {
-    IPHeader *pIpHeader = (IPHeader *) RtlOffsetToPointer(pDataPages[0].Virtual, ulStartOffset);
+    IPHeader *pIpHeader = (IPHeader *) RtlOffsetToPointer(pDataPages[0].Cached, ulStartOffset);
 
     tTcpIpPacketParsingResult res = QualifyIpPacket(pIpHeader, ulDataLength, verifyLength);
     if (res.ipStatus == ppresNotIP || res.ipCheckSum == ppresIPTooShort)

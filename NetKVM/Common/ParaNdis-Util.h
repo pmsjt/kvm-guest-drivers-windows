@@ -565,6 +565,39 @@ private:
     CNdisSharedMemory& operator= (const CNdisSharedMemory&) = delete;
 };
 
+class CNdisCachedSharedMemory
+{
+public:
+    explicit CNdisCachedSharedMemory()
+        : m_DrvHandle(NULL)
+    {}
+
+    bool Create(NDIS_HANDLE DrvHandle)
+    {
+        m_DrvHandle = DrvHandle;
+        return true;
+    }
+
+    ~CNdisCachedSharedMemory();
+    bool Allocate(ULONG Size, bool IsCached = true);
+    void SyncToPhysical();
+
+    ULONG GetSize() const { return m_Size; }
+    PVOID GetVA() const { return m_Cached; }
+    NDIS_PHYSICAL_ADDRESS GetPA() const { return m_PA; }
+private:
+    NDIS_HANDLE m_DrvHandle;
+
+    PVOID m_Cached = nullptr;
+    PVOID m_VA = nullptr;
+    NDIS_PHYSICAL_ADDRESS m_PA = NDIS_PHYSICAL_ADDRESS();
+    ULONG m_Size = 0;
+    bool m_IsCached = false;
+
+    CNdisCachedSharedMemory(const CNdisCachedSharedMemory&) = delete;
+    CNdisCachedSharedMemory& operator= (const CNdisCachedSharedMemory&) = delete;
+};
+
 class CNdisEvent
 {
 public:

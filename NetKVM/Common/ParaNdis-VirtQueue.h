@@ -66,8 +66,13 @@ public:
     PHYSICAL_ADDRESS IPHeadersPA() const
     { return m_IPHeadersPA; }
 
+    void SyncToPhysical()
+    {
+        m_HeadersBuffer.SyncToPhysical();
+    }
+
 private:
-    CNdisSharedMemory m_HeadersBuffer;
+    CNdisCachedSharedMemory m_HeadersBuffer;
     ULONG m_VirtioHdrSize;
 
     PVOID m_VlanHeaderVA = nullptr;

@@ -29,9 +29,50 @@ bool CNdisSharedMemory::Allocate(ULONG Size, bool IsCached)
 
 CNdisSharedMemory::~CNdisSharedMemory()
 {
+    if (m_VA != nullptr)
+    {
+        NdisMFreeSharedMemory(m_DrvHandle, m_Size, m_IsCached, m_VA, m_PA);
+        m_VA = nullptr;
+    }
+}
+
+void CNdisCachedSharedMemory::SyncToPhysical()
+{
+    if ((m_VA != nullptr) && (m_Cached != nullptr))
+    {
+        NdisMoveMemory(m_VA, m_Cached, m_Size);
+    }
+}
+
+bool CNdisCachedSharedMemory::Allocate(ULONG Size, bool IsCached)
+{
+    m_Size = Size;
+    m_IsCached = IsCached;
+
+    {
+        // Allocate a "shadow" cached memory buffer
+        PHYSICAL_ADDRESS cache_top;
+        cache_top.QuadPart = MAXULONG64;
+        m_Cached = MmAllocateContiguousMemory(Size, cache_top);
+        if (m_Cached == nullptr) return false;
+    }
+
+    NdisMAllocateSharedMemory(m_DrvHandle, Size, m_IsCached, &m_VA, &m_PA);
+
+    return m_VA != nullptr;
+}
+
+CNdisCachedSharedMemory::~CNdisCachedSharedMemory()
+{
     if(m_VA != nullptr)
     {
         NdisMFreeSharedMemory(m_DrvHandle, m_Size, m_IsCached, m_VA, m_PA);
+        m_VA = nullptr;
+    }
+
+    if (m_Cached != nullptr)
+    {
+        MmFreeContiguousMemory(m_Cached);
         m_VA = nullptr;
     }
 }
