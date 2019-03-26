@@ -382,6 +382,8 @@ bool CTXDescriptor::SetupHeaders(ULONG ParsedHeadersLength)
 {
     m_CurrVirtioSGLEntry = 0;
 
+    m_Headers.SyncToPhysical();
+
     if (m_Headers.VlanHeader()->TCI == 0)
     {
         if (m_AnyLayout)

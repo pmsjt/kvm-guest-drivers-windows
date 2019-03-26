@@ -111,6 +111,14 @@ pRxNetDescriptor CParaNdisRX::CreateRxDescriptorOnInit()
                 ulPagesToAlloc /= 2;
         }
 
+        {
+            // Allocate a "shadow" cached memory buffer
+            PHYSICAL_ADDRESS cache_top;
+            cache_top.QuadPart = MAXULONG64;
+            p->PhysicalPages[p->BufferSGLength].Cached = MmAllocateContiguousMemory ( PAGE_SIZE * ulPagesToAlloc, cache_top);
+            if (p->PhysicalPages[p->BufferSGLength].Cached == NULL) goto error_exit;
+        }
+
         p->BufferSGArray[p->BufferSGLength].physAddr = p->PhysicalPages[p->BufferSGLength].Physical;
         p->BufferSGArray[p->BufferSGLength].length = p->PhysicalPages[p->BufferSGLength].size;
 
@@ -216,6 +224,17 @@ VOID CParaNdisRX::ProcessRxRing(CCHAR nCurrCpuReceiveQueue)
         RemoveEntryList(&pBufferDescriptor->listEntry);
         m_NetNofReceiveBuffers--;
 
+        {
+            ULONG bufnum;
+            tCompletePhysicalAddress *sync_physical_addr;
+
+            for (bufnum = 0; bufnum < pBufferDescriptor->BufferSGLength; bufnum += 1)
+            {
+                sync_physical_addr = &(pBufferDescriptor->PhysicalPages[bufnum]);
+                NdisMoveMemory(sync_physical_addr->Cached, sync_physical_addr->Virtual, sync_physical_addr->size);
+            }
+        }
+
         BOOLEAN packetAnalysisRC;
 
         packetAnalysisRC = ParaNdis_PerformPacketAnalysis(
@@ -224,7 +243,7 @@ VOID CParaNdisRX::ProcessRxRing(CCHAR nCurrCpuReceiveQueue)
 #endif
 
             &pBufferDescriptor->PacketInfo,
-            pBufferDescriptor->PhysicalPages[PARANDIS_FIRST_RX_DATA_PAGE].Virtual,
+            pBufferDescriptor->PhysicalPages[PARANDIS_FIRST_RX_DATA_PAGE].Cached,
             nFullLength - m_Context->nVirtioHeaderSize);
 
 

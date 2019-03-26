@@ -110,6 +110,8 @@ BOOLEAN ParaNdis_InitialAllocatePhysicalMemory(
     ULONG ulSize,
     tCompletePhysicalAddress *pAddresses)
 {
+    pAddresses->Cached = NULL;
+
     NdisMAllocateSharedMemory(
         pContext->MiniportHandle,
         ulSize,
@@ -143,6 +145,11 @@ VOID ParaNdis_FreePhysicalMemory(
         TRUE,
         pAddresses->Virtual,
         pAddresses->Physical);
+
+    if (pAddresses->Cached != NULL)
+    {
+        MmFreeContiguousMemory(pAddresses->Cached);
+    }
 }
 
 #if (NDIS_SUPPORT_NDIS620)
@@ -755,11 +762,23 @@ BOOLEAN ParaNdis_BindRxBufferToPacket(
 
     for(i = PARANDIS_FIRST_RX_DATA_PAGE; i < p->BufferSGLength; i++)
     {
-        *NextMdlLinkage = NdisAllocateMdl(
-            pContext->MiniportHandle,
-            p->PhysicalPages[i].Virtual,
-            p->PhysicalPages[i].size);
-        if(*NextMdlLinkage == NULL) goto error_exit;
+        if (p->PhysicalPages[i].Cached != NULL)
+        {
+            *NextMdlLinkage = NdisAllocateMdl(
+                pContext->MiniportHandle,
+                p->PhysicalPages[i].Cached,
+                p->PhysicalPages[i].size);
+        }
+        else
+        {
+            __debugbreak();
+
+            *NextMdlLinkage = NdisAllocateMdl(
+                pContext->MiniportHandle,
+                p->PhysicalPages[i].Virtual,
+                p->PhysicalPages[i].size);
+        }
+        if (*NextMdlLinkage == NULL) goto error_exit;
 
         NextMdlLinkage = &(NDIS_MDL_LINKAGE(*NextMdlLinkage));
     }
@@ -935,7 +954,16 @@ tPacketIndicationType ParaNdis_PrepareReceivedPacket(
 
         if (pNBL)
         {
-            virtio_net_hdr_rsc *pHeader = (virtio_net_hdr_rsc *) pBuffersDesc->PhysicalPages[0].Virtual;
+            virtio_net_hdr_rsc *pHeader;
+            if (pBuffersDesc->PhysicalPages[0].Cached != NULL) {
+                pHeader = (virtio_net_hdr_rsc *)pBuffersDesc->PhysicalPages[0].Cached;
+            }
+            else
+            {
+                __debugbreak();
+                pHeader = (virtio_net_hdr_rsc *)pBuffersDesc->PhysicalPages[0].Virtual;
+            }
+
             tChecksumCheckResult csRes;
             NDIS_TCP_IP_CHECKSUM_NET_BUFFER_LIST_INFO qCSInfo;
             qCSInfo.Value = NULL;
