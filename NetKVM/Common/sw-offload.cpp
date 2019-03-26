@@ -176,15 +176,7 @@ static __inline USHORT CheckSumCalculator(tCompletePhysicalAddress *pDataPages, 
     while(len > 0)
     {
         PVOID pCurrentPageDataStart;
-        if (pCurrentPage->Cached != NULL)
-        {
-            pCurrentPageDataStart = RtlOffsetToPointer(pCurrentPage->Cached, ulCurrPageOffset);
-        }
-        else
-        {
-            __debugbreak();
-            pCurrentPageDataStart = RtlOffsetToPointer(pCurrentPage->Virtual, ulCurrPageOffset);
-        }
+        pCurrentPageDataStart = RtlOffsetToPointer(pCurrentPage->Cached, ulCurrPageOffset);
 
         ULONG ulCurrentPageDataLength = min(len, pCurrentPage->size - ulCurrPageOffset);
 
@@ -558,15 +550,7 @@ VerifyTcpChecksum(
     tTcpIpPacketParsingResult res = known;
     IPHeader *pIpHeader;
 
-    if (pDataPages[0].Cached != NULL)
-    {
-        pIpHeader = (IPHeader *)RtlOffsetToPointer(pDataPages[0].Cached, ulStartOffset);
-    }
-    else
-    {
-        __debugbreak();
-        pIpHeader = (IPHeader *)RtlOffsetToPointer(pDataPages[0].Virtual, ulStartOffset);
-    }
+    pIpHeader = (IPHeader *)RtlOffsetToPointer(pDataPages[0].Cached, ulStartOffset);
 
     TCPHeader *pTcpHeader = (TCPHeader *)RtlOffsetToPointer(pIpHeader, res.ipHeaderSize);
     USHORT saved = pTcpHeader->tcp_xsum;
@@ -640,15 +624,7 @@ VerifyUdpChecksum(
     tTcpIpPacketParsingResult res = known;
     IPHeader *pIpHeader;
 
-    if (pDataPages[0].Cached != NULL)
-    {
-        pIpHeader = (IPHeader *)RtlOffsetToPointer(pDataPages[0].Cached, ulStartOffset);
-    }
-    else
-    {
-        __debugbreak();
-        pIpHeader = (IPHeader *)RtlOffsetToPointer(pDataPages[0].Virtual, ulStartOffset);
-    }
+    pIpHeader = (IPHeader *)RtlOffsetToPointer(pDataPages[0].Cached, ulStartOffset);
 
     UDPHeader *pUdpHeader = (UDPHeader *)RtlOffsetToPointer(pIpHeader, res.ipHeaderSize);
     USHORT saved = pUdpHeader->udp_xsum;
@@ -748,15 +724,7 @@ tTcpIpPacketParsingResult ParaNdis_CheckSumVerify(
 {
     IPHeader *pIpHeader;
 
-    if (pDataPages[0].Cached != NULL)
-    {
-        pIpHeader = (IPHeader *)RtlOffsetToPointer(pDataPages[0].Cached, ulStartOffset);
-    }
-    else
-    {
-        __debugbreak();
-        pIpHeader = (IPHeader *)RtlOffsetToPointer(pDataPages[0].Virtual, ulStartOffset);
-    }
+    pIpHeader = (IPHeader *)RtlOffsetToPointer(pDataPages[0].Cached, ulStartOffset);
 
     tTcpIpPacketParsingResult res = QualifyIpPacket(pIpHeader, ulDataLength, verifyLength);
     if (res.ipStatus == ppresNotIP || res.ipCheckSum == ppresIPTooShort)
