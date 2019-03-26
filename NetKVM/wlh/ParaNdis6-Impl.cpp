@@ -766,8 +766,7 @@ BOOLEAN ParaNdis_BindRxBufferToPacket(
             pContext->MiniportHandle,
             p->PhysicalPages[i].Cached,
             p->PhysicalPages[i].size);
-
-        if (*NextMdlLinkage == NULL) goto error_exit;
+        if(*NextMdlLinkage == NULL) goto error_exit;
 
         NextMdlLinkage = &(NDIS_MDL_LINKAGE(*NextMdlLinkage));
     }
@@ -943,9 +942,7 @@ tPacketIndicationType ParaNdis_PrepareReceivedPacket(
 
         if (pNBL)
         {
-            virtio_net_hdr_rsc *pHeader;
-            pHeader = (virtio_net_hdr_rsc *)pBuffersDesc->PhysicalPages[0].Cached;
-
+            virtio_net_hdr_rsc *pHeader = (virtio_net_hdr_rsc *)pBuffersDesc->PhysicalPages[0].Cached;
             tChecksumCheckResult csRes;
             NDIS_TCP_IP_CHECKSUM_NET_BUFFER_LIST_INFO qCSInfo;
             qCSInfo.Value = NULL;

@@ -24,7 +24,6 @@ bool CNdisSharedMemory::Allocate(ULONG Size, bool IsCached)
     m_Size = Size;
     m_IsCached = IsCached;
     NdisMAllocateSharedMemory(m_DrvHandle, Size, m_IsCached, &m_VA, &m_PA);
-
     return m_VA != nullptr;
 }
 
