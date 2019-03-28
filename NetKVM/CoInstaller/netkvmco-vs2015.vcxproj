@@ -275,6 +275,7 @@
       <CallingConvention>Cdecl</CallingConvention>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32_LEAN_AND_MEAN=1;NETCO_EXPORTS</PreprocessorDefinitions>
       <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
+      <Optimization>Disabled</Optimization>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Win8 Release|x64'">

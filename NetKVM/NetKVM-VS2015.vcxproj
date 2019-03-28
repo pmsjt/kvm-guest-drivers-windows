@@ -366,6 +366,7 @@
       <WppScanConfigurationData>Common\Trace.h</WppScanConfigurationData>
       <WppAdditionalOptions>%(WppAdditionalOptions)</WppAdditionalOptions>
       <InlineFunctionExpansion Condition="'$(Configuration)|$(Platform)'=='Win10 Release|ARM64'">Disabled</InlineFunctionExpansion>
+      <Optimization Condition="'$(Configuration)|$(Platform)'=='Win10 Release|ARM64'">Disabled</Optimization>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>

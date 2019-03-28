@@ -239,6 +239,7 @@
       <WarningLevel>Level3</WarningLevel>
       <DisableLanguageExtensions>false</DisableLanguageExtensions>
       <InlineFunctionExpansion Condition="'$(Configuration)|$(Platform)'=='Win10 Release|ARM64'">Disabled</InlineFunctionExpansion>
+      <Optimization Condition="'$(Configuration)|$(Platform)'=='Win10 Release|ARM64'">Disabled</Optimization>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(PlatformToolset)'=='v141_xp'">
